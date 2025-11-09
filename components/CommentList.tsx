@@ -22,7 +22,6 @@ return (
 );
 }
 
-
 const styles = StyleSheet.create({
 inputRow: { flexDirection: 'row', marginTop: 8, alignItems: 'center' },
 input: { flex: 1, borderWidth: StyleSheet.hairlineWidth, borderColor: '#ddd', borderRadius: 8, padding: 8 },

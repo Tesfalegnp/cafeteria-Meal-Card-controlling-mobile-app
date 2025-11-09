@@ -57,7 +57,7 @@ export default function Header() {
           source={
             photoUrl
               ? { uri: photoUrl }
-              : require('../assets/images/react-logo.png') // fallback logo
+              : require('../assets/images/placeholder_account.jpeg') // fallback logo
           }
           style={styles.logo}
         />
