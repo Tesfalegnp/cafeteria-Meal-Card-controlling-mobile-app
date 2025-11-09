@@ -1,98 +1,410 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
 
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+// app/(tabs)/index.tsx
+// Enhanced Home Screen — MTU Cafeteria Meal Card App
+// Modern, attractive welcome page with campus branding and intuitive navigation
+
+import React from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import { useRouter } from 'expo-router';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { StatusBar } from 'expo-status-bar';
+
+const { width } = Dimensions.get('window');
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const router = useRouter();
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  return (
+    <SafeAreaView style={styles.safe}>
+      <StatusBar style="light" />
+      <ScrollView 
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* --- Header with Gradient Background --- */}
+        <LinearGradient
+          colors={['#1e3c72', '#2a5298', '#1e3c72']}
+          style={styles.header}
+        >
+          <View style={styles.headerContent}>
+            <Image
+              source={require('../../assets/images/logo-placeholder.png')} // Add MTU logo
+              style={styles.logo}
+              resizeMode="contain"
+            />
+            <Text style={styles.universityName}>Mizan Tepi University</Text>
+            <Text style={styles.appTitle}>Digital Cafeteria System</Text>
+            <View style={styles.welcomeBadge}>
+              <Ionicons name="cafe-outline" size={20} color="#fff" />
+              <Text style={styles.welcomeText}>Welcome to Smart Dining</Text>
+            </View>
+          </View>
+        </LinearGradient>
+
+        {/* --- Quick Actions Section --- */}
+        <View style={styles.quickActions}>
+          <Text style={styles.sectionTitle}>Quick Actions</Text>
+          <View style={styles.actionsGrid}>
+            <QuickActionCard
+              title="Meal Card"
+              icon="card"
+              color="#FF6B6B"
+              subtitle="View Balance"
+              value="125.50 ETB"
+              onPress={() => router.push('/(tabs)')}
+            />
+            <QuickActionCard
+              title="Today's Menu"
+              icon="restaurant"
+              color="#4ECDC4"
+              subtitle="Available Meals"
+              value="8 Items"
+              onPress={() => router.push('/(tabs)')}
+            />
+          </View>
+        </View>
+
+        {/* --- Main Features Grid --- */}
+        <View style={styles.featuresSection}>
+          <Text style={styles.sectionTitle}>Cafeteria Services</Text>
+          <View style={styles.featuresGrid}>
+            <FeatureCard
+              title="Scan QR Code"
+              icon="qr-code"
+              description="Quick meal purchase"
+              color="#45B7D1"
+              onPress={() => router.push('/(tabs)/qrcode')}
+            />
+            <FeatureCard
+              title="Meal History"
+              icon="time"
+              description="View past transactions"
+              color="#96CEB4"
+              onPress={() => router.push('/(tabs)')}
+            />
+            <FeatureCard
+              title="Top Up"
+              icon="add-circle"
+              description="Add funds to card"
+              color="#FECA57"
+              onPress={() => router.push('/(tabs)')}
+            />
+            <FeatureCard
+              title="Settings"
+              icon="settings"
+              description="Account preferences"
+              color="#FF9FF3"
+              onPress={() => router.push('/(tabs)/settings')}
+            />
+          </View>
+        </View>
+
+        {/* --- Campus Info Card --- */}
+        <View style={styles.campusCard}>
+          <LinearGradient
+            colors={['#667eea', '#764ba2']}
+            style={styles.campusCardGradient}
+          >
+            <View style={styles.campusInfo}>
+              <Ionicons name="school-outline" size={32} color="#fff" />
+              <View style={styles.campusText}>
+                <Text style={styles.campusName}>MTU Tepi Campus</Text>
+                <Text style={styles.campusHours}>Cafeteria Hours: 7:00 AM - 8:00 PM</Text>
+              </View>
+            </View>
+            <View style={styles.stats}>
+              <View style={styles.statItem}>
+                <Text style={styles.statNumber}>1,200+</Text>
+                <Text style={styles.statLabel}>Students Served</Text>
+              </View>
+              <View style={styles.statItem}>
+                <Text style={styles.statNumber}>15+</Text>
+                <Text style={styles.statLabel}>Daily Meals</Text>
+              </View>
+            </View>
+          </LinearGradient>
+        </View>
+
+        {/* --- Emergency Contact --- */}
+        <View style={styles.contactCard}>
+          <View style={styles.contactHeader}>
+            <Ionicons name="call-outline" size={20} color="#e74c3c" />
+            <Text style={styles.contactTitle}>Need Help?</Text>
+          </View>
+          <Text style={styles.contactText}>
+            Cafeteria Manager: +251-912-002-813{"\n"}
+            Support: andualem@gmail.edu.et
+          </Text>
+        </View>
+
+        {/* --- Footer --- */}
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>© 2025 Mizan Tepi University</Text>
+          <Text style={styles.footerSubtext}>By Tesfalegn Petros and Birhanu Kassa from software department at 2014 batch</Text>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
+// Quick Action Card Component
+function QuickActionCard({ title, icon, color, subtitle, value, onPress }: any) {
+  return (
+    <TouchableOpacity style={styles.quickActionCard} onPress={onPress}>
+      <LinearGradient
+        colors={[color, `${color}DD`]}
+        style={styles.quickActionGradient}
+      >
+        <View style={styles.quickActionHeader}>
+          <Ionicons name={icon} size={24} color="#fff" />
+          <Text style={styles.quickActionTitle}>{title}</Text>
+        </View>
+        <Text style={styles.quickActionSubtitle}>{subtitle}</Text>
+        <Text style={styles.quickActionValue}>{value}</Text>
+      </LinearGradient>
+    </TouchableOpacity>
+  );
+}
+
+// Feature Card Component
+function FeatureCard({ title, icon, description, color, onPress }: any) {
+  return (
+    <TouchableOpacity style={styles.featureCard} onPress={onPress}>
+      <View style={[styles.featureIcon, { backgroundColor: color }]}>
+        <Ionicons name={icon} size={28} color="#fff" />
+      </View>
+      <Text style={styles.featureTitle}>{title}</Text>
+      <Text style={styles.featureDescription}>{description}</Text>
+    </TouchableOpacity>
+  );
+}
+
+// --- Enhanced Styles ---
 const styles = StyleSheet.create({
-  titleContainer: {
+  safe: {
+    flex: 1,
+    backgroundColor: '#f8f9fa',
+  },
+  scrollContainer: {
+    flexGrow: 1,
+  },
+  header: {
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+  },
+  headerContent: {
+    alignItems: 'center',
+  },
+  logo: {
+    width: 80,
+    height: 80,
+    marginBottom: 10,
+  },
+  universityName: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 5,
+  },
+  appTitle: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.9)',
+    marginBottom: 15,
+  },
+  welcomeBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 20,
   },
-  stepContainer: {
-    gap: 8,
+  welcomeText: {
+    color: '#fff',
+    marginLeft: 5,
+    fontWeight: '600',
+    fontSize: 12,
+  },
+  quickActions: {
+    padding: 20,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#2c3e50',
+    marginBottom: 15,
+  },
+  actionsGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  quickActionCard: {
+    width: '48%',
+    height: 120,
+    borderRadius: 20,
+    overflow: 'hidden',
+  },
+  quickActionGradient: {
+    flex: 1,
+    padding: 15,
+    justifyContent: 'space-between',
+  },
+  quickActionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  quickActionTitle: {
+    color: '#fff',
+    fontWeight: '600',
+    marginLeft: 8,
+    fontSize: 14,
+  },
+  quickActionSubtitle: {
+    color: 'rgba(255,255,255,0.8)',
+    fontSize: 12,
+    marginTop: 5,
+  },
+  quickActionValue: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 18,
+    marginTop: 5,
+  },
+  featuresSection: {
+    padding: 20,
+    paddingTop: 0,
+  },
+  featuresGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  featureCard: {
+    width: '48%',
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 15,
+    marginBottom: 15,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  featureIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  featureTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#2c3e50',
+    textAlign: 'center',
+    marginBottom: 5,
+  },
+  featureDescription: {
+    fontSize: 12,
+    color: '#7f8c8d',
+    textAlign: 'center',
+  },
+  campusCard: {
+    margin: 20,
+    borderRadius: 20,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  campusCardGradient: {
+    padding: 20,
+  },
+  campusInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  campusText: {
+    marginLeft: 15,
+  },
+  campusName: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  campusHours: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.9)',
+    marginTop: 2,
+  },
+  stats: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  statItem: {
+    alignItems: 'center',
+  },
+  statNumber: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#fff',
+  },
+  statLabel: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.9)',
+    marginTop: 2,
+  },
+  contactCard: {
+    backgroundColor: '#fff',
+    margin: 20,
+    padding: 15,
+    borderRadius: 15,
+    borderLeftWidth: 4,
+    borderLeftColor: '#e74c3c',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  contactHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 8,
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  contactTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2c3e50',
+    marginLeft: 8,
+  },
+  contactText: {
+    fontSize: 12,
+    color: '#7f8c8d',
+    lineHeight: 18,
+  },
+  footer: {
+    alignItems: 'center',
+    padding: 20,
+    paddingTop: 10,
+  },
+  footerText: {
+    fontSize: 12,
+    color: '#95a5a6',
+    marginBottom: 5,
+  },
+  footerSubtext: {
+    fontSize: 10,
+    color: '#bdc3c7',
   },
 });
