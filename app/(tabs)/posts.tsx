@@ -1,5 +1,5 @@
 // app/(tabs)/posts.tsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -13,6 +13,7 @@ import {
   ScrollView,
   Image,
   RefreshControl,
+  Animated,
 } from 'react-native';
 import { supabase } from '../../lib/supabaseClient';
 import { useRouter } from 'expo-router';
@@ -267,6 +268,9 @@ function PostItem({
   );
 }
 
+// Create animated FlatList component
+const AnimatedFlatList = Animated.createAnimatedComponent(FlatList);
+
 // ----------------------------
 // Posts Screen
 // ----------------------------
@@ -277,6 +281,14 @@ export default function PostsScreen() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [commentsByPost, setCommentsByPost] = useState<Record<string, Comment[]>>({});
   const [commentText, setCommentText] = useState<Record<string, string>>({});
+  
+  // Animation values for header
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const headerTranslateY = scrollY.interpolate({
+    inputRange: [0, 100],
+    outputRange: [0, -120],
+    extrapolate: 'clamp',
+  });
 
   useEffect(() => {
     fetchPosts();
@@ -286,6 +298,12 @@ export default function PostsScreen() {
     setRefreshing(true);
     fetchPosts().then(() => setRefreshing(false));
   }, []);
+
+  // Handle scroll event
+  const handleScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+    { useNativeDriver: true }
+  );
 
   // ----------------------------
   // Fetch all posts (same as your working code)
@@ -385,7 +403,7 @@ export default function PostsScreen() {
           user_id: userId,
           reaction_type: type,
         },
-        { onConflict: ['post_id', 'user_id'] } // ✅ same as your working code
+        { onConflict: ['post_id', 'user_id'] } 
       );
 
       if (error) throw error;
@@ -474,19 +492,28 @@ export default function PostsScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header */}
-      <LinearGradient
-        colors={['#1e3c72', '#2a5298']}
-        style={styles.header}
+      {/* Animated Header */}
+      <Animated.View 
+        style={[
+          styles.header,
+          {
+            transform: [{ translateY: headerTranslateY }]
+          }
+        ]}
       >
-        <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>Campus Posts</Text>
-          <Text style={styles.headerSubtitle}>Stay updated with campus news</Text>
-        </View>
-      </LinearGradient>
+        <LinearGradient
+          colors={['#1e3c72', '#2a5298']}
+          style={styles.headerGradient}
+        >
+          <View style={styles.headerContent}>
+            <Text style={styles.headerTitle}>Campus Posts</Text>
+            <Text style={styles.headerSubtitle}>Stay updated with campus news</Text>
+          </View>
+        </LinearGradient>
+      </Animated.View>
 
-      {/* Posts List */}
-      <FlatList
+      {/* Posts List - Using AnimatedFlatList instead of regular FlatList */}
+      <AnimatedFlatList
         data={posts}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
@@ -510,6 +537,8 @@ export default function PostsScreen() {
             tintColor="#2a5298"
           />
         }
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <Ionicons name="newspaper-outline" size={64} color="#ccc" />
@@ -544,6 +573,21 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   header: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  headerGradient: {
     paddingVertical: 20,
     paddingHorizontal: 20,
     borderBottomLeftRadius: 25,
@@ -563,8 +607,8 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.9)',
   },
   postsList: {
+    paddingTop: 120, // Space for the animated header
     paddingBottom: 20,
-    paddingTop: 10,
   },
   postCard: {
     backgroundColor: '#fff',
@@ -754,6 +798,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 60,
     paddingHorizontal: 40,
+    marginTop: 20,
   },
   emptyTitle: {
     fontSize: 20,
