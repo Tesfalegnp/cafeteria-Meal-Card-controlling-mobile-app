@@ -1,31 +1,82 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+// // app/settings/customize.tsx
+// import React, { useEffect, useState } from 'react';
+// import { View, Text, Switch, StyleSheet, Alert } from 'react-native';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function CustomizeScreen() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Customize App</Text>
-      <Text style={styles.subtitle}>Change theme or adjust app appearance.</Text>
+// export default function Customize() {
+//   const [darkMode, setDarkMode] = useState(false);
+//   const [loading, setLoading] = useState(true);
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Light Theme</Text>
-      </TouchableOpacity>
+//   useEffect(() => {
+//     (async () => {
+//       const v = await AsyncStorage.getItem('pref_theme');
+//       setDarkMode(v === 'dark');
+//       setLoading(false);
+//     })();
+//   }, []);
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Dark Theme</Text>
-      </TouchableOpacity>
+//   const onToggle = async (val: boolean) => {
+//     setDarkMode(val);
+//     await AsyncStorage.setItem('pref_theme', val ? 'dark' : 'light');
+//     Alert.alert('Saved', `Theme saved: ${val ? 'dark' : 'light'}`);
+//   };
 
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Font Size</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
+//   if (loading) return null;
 
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, paddingTop: 40 },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 10 },
-  subtitle: { fontSize: 16, marginBottom: 20 },
-  button: { marginTop: 12, backgroundColor: '#2f95dc', padding: 12, borderRadius: 8, alignItems: 'center' },
-  buttonText: { color: '#fff', fontWeight: '600' },
-});
+//   return (
+//     <View style={styles.container}>
+//       <Text style={styles.title}>Customize App</Text>
+//       <View style={styles.row}>
+//         <Text>Dark mode</Text>
+//         <Switch value={darkMode} onValueChange={onToggle} />
+//       </View>
+//     </View>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   container: { flex: 1, padding: 16, backgroundColor: '#f7f8fb' },
+//   title: { fontSize: 20, fontWeight: '700', marginBottom: 18 },
+//   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12 },
+// });
+// // app/settings/customize.tsx
+// import React, { useEffect, useState } from 'react';
+// import { View, Text, Switch, StyleSheet, Alert } from 'react-native';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// export default function Customize() {
+//   const [darkMode, setDarkMode] = useState(false);
+//   const [loading, setLoading] = useState(true);
+
+//   useEffect(() => {
+//     (async () => {
+//       const v = await AsyncStorage.getItem('pref_theme');
+//       setDarkMode(v === 'dark');
+//       setLoading(false);
+//     })();
+//   }, []);
+
+//   const onToggle = async (val: boolean) => {
+//     setDarkMode(val);
+//     await AsyncStorage.setItem('pref_theme', val ? 'dark' : 'light');
+//     Alert.alert('Saved', `Theme saved: ${val ? 'dark' : 'light'}`);
+//   };
+
+//   if (loading) return null;
+
+//   return (
+//     <View style={styles.container}>
+//       <Text style={styles.title}>Customize App</Text>
+//       <View style={styles.row}>
+//         <Text>Dark mode</Text>
+//         <Switch value={darkMode} onValueChange={onToggle} />
+//       </View>
+//     </View>
+//   );
+// }
+
+// const styles = StyleSheet.create({
+//   container: { flex: 1, padding: 16, backgroundColor: '#f7f8fb' },
+//   title: { fontSize: 20, fontWeight: '700', marginBottom: 18 },
+//   row: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 12 },
+// });
