@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "TCSS-3",
+    "name": "Meal_Card Controlling",
     "slug": "TCSS-3",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logo-placeholder.png",
     "scheme": "tcss3",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,

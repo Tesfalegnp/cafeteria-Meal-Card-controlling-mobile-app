@@ -1,8 +1,3 @@
-
-// app/(tabs)/index.tsx
-// Enhanced Home Screen — MTU Cafeteria Meal Card App
-// Modern, attractive welcome page with campus branding and intuitive navigation
-
 import React from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -10,11 +5,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
+import { useAuth } from '../../contexts/AuthContext';
 
 const { width } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { student } = useAuth();
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -29,16 +26,15 @@ export default function HomeScreen() {
           style={styles.header}
         >
           <View style={styles.headerContent}>
-            <Image
-              source={require('../../assets/images/logo-placeholder.png')} // Add MTU logo
-              style={styles.logo}
-              resizeMode="contain"
-            />
             <Text style={styles.universityName}>Mizan Tepi University</Text>
             <Text style={styles.appTitle}>Digital Cafeteria System</Text>
+            
+            {/* Welcome Badge with Student Info */}
             <View style={styles.welcomeBadge}>
               <Ionicons name="cafe-outline" size={20} color="#fff" />
-              <Text style={styles.welcomeText}>Welcome to Smart Dining</Text>
+              <Text style={styles.welcomeText}>
+                Welcome, {student?.first_name}
+              </Text>
             </View>
           </View>
         </LinearGradient>
@@ -51,7 +47,7 @@ export default function HomeScreen() {
               title="Meal Card"
               icon="card"
               color="#FF6B6B"
-              subtitle="View Balance"
+              subtitle="Current Balance"
               value="125.50 ETB"
               onPress={() => router.push('/(tabs)')}
             />
@@ -61,7 +57,7 @@ export default function HomeScreen() {
               color="#4ECDC4"
               subtitle="Available Meals"
               value="8 Items"
-              onPress={() => router.push('/(tabs)')}
+              onPress={() => router.push('/(tabs)/rule_regulation')}
             />
           </View>
         </View>
@@ -92,13 +88,36 @@ export default function HomeScreen() {
               onPress={() => router.push('/(tabs)')}
             />
             <FeatureCard
-              title="Settings"
-              icon="settings"
-              description="Account preferences"
-              color="#FF9FF3"
-              onPress={() => router.push('/(tabs)/settings')}
+              title="Rules & Regulations"
+              icon="document-text"
+              description="Cafeteria policies"
+              color="#FF6B8B"
+              onPress={() => router.push('/(tabs)/rule_regulation')}
             />
           </View>
+        </View>
+
+        {/* --- Additional Features Row --- */}
+        <View style={styles.additionalFeatures}>
+          <TouchableOpacity style={styles.additionalFeature} onPress={() => router.push('/settings/about')}>
+            <LinearGradient
+              colors={['#667eea', '#764ba2']}
+              style={styles.additionalFeatureGradient}
+            >
+              <Ionicons name="settings" size={24} color="#fff" />
+              <Text style={styles.additionalFeatureText}>About Us</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.additionalFeature} onPress={() => router.push('/(tabs)/rule_regulation')}>
+            <LinearGradient
+              colors={['#f093fb', '#f5576c']}
+              style={styles.additionalFeatureGradient}
+            >
+              <Ionicons name="help-circle" size={24} color="#fff" />
+              <Text style={styles.additionalFeatureText}>Help & Support</Text>
+            </LinearGradient>
+          </TouchableOpacity>
         </View>
 
         {/* --- Campus Info Card --- */}
@@ -127,6 +146,25 @@ export default function HomeScreen() {
           </LinearGradient>
         </View>
 
+        {/* --- Quick Stats --- */}
+        <View style={styles.quickStats}>
+          <View style={styles.statCard}>
+            <Ionicons name="fast-food" size={24} color="#FF6B6B" />
+            <Text style={styles.statCardNumber}>3</Text>
+            <Text style={styles.statCardLabel}>Meals Today</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Ionicons name="calendar" size={24} color="#4ECDC4" />
+            <Text style={styles.statCardNumber}>42</Text>
+            <Text style={styles.statCardLabel}>This Month</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Ionicons name="wallet" size={24} color="#FECA57" />
+            <Text style={styles.statCardNumber}>125.50</Text>
+            <Text style={styles.statCardLabel}>Balance</Text>
+          </View>
+        </View>
+
         {/* --- Emergency Contact --- */}
         <View style={styles.contactCard}>
           <View style={styles.contactHeader}>
@@ -137,12 +175,18 @@ export default function HomeScreen() {
             Cafeteria Manager: +251-912-002-813{"\n"}
             Support: andualem@gmail.edu.et
           </Text>
+          <TouchableOpacity style={styles.emergencyButton}>
+            <Ionicons name="alert-circle" size={16} color="#fff" />
+            <Text style={styles.emergencyButtonText}>Emergency Contact</Text>
+          </TouchableOpacity>
         </View>
 
         {/* --- Footer --- */}
         <View style={styles.footer}>
           <Text style={styles.footerText}>© 2025 Mizan Tepi University</Text>
-          <Text style={styles.footerSubtext}>By Tesfalegn Petros and Birhanu Kassa from software department at 2014 batch</Text>
+          <Text style={styles.footerSubtext}>
+            By Tesfalegn Petros and Birhanu Kassa from software department at 2014 batch
+          </Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -199,11 +243,6 @@ const styles = StyleSheet.create({
   headerContent: {
     alignItems: 'center',
   },
-  logo: {
-    width: 80,
-    height: 80,
-    marginBottom: 10,
-  },
   universityName: {
     fontSize: 18,
     fontWeight: '700',
@@ -222,6 +261,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 20,
+    marginBottom: 10,
   },
   welcomeText: {
     color: '#fff',
@@ -247,6 +287,11 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 20,
     overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
   quickActionGradient: {
     flex: 1,
@@ -316,6 +361,30 @@ const styles = StyleSheet.create({
     color: '#7f8c8d',
     textAlign: 'center',
   },
+  additionalFeatures: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
+  additionalFeature: {
+    flex: 1,
+    marginHorizontal: 5,
+    height: 70,
+    borderRadius: 15,
+    overflow: 'hidden',
+  },
+  additionalFeatureGradient: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 10,
+  },
+  additionalFeatureText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+    marginTop: 5,
+  },
   campusCard: {
     margin: 20,
     borderRadius: 20,
@@ -364,10 +433,39 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.9)',
     marginTop: 2,
   },
+  quickStats: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  statCard: {
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 15,
+    alignItems: 'center',
+    marginHorizontal: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  statCardNumber: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#2c3e50',
+    marginTop: 5,
+  },
+  statCardLabel: {
+    fontSize: 11,
+    color: '#7f8c8d',
+    marginTop: 2,
+  },
   contactCard: {
     backgroundColor: '#fff',
     margin: 20,
-    padding: 15,
+    padding: 20,
     borderRadius: 15,
     borderLeftWidth: 4,
     borderLeftColor: '#e74c3c',
@@ -392,6 +490,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#7f8c8d',
     lineHeight: 18,
+    marginBottom: 15,
+  },
+  emergencyButton: {
+    flexDirection: 'row',
+    backgroundColor: '#e74c3c',
+    padding: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emergencyButtonText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '600',
+    marginLeft: 5,
   },
   footer: {
     alignItems: 'center',
@@ -406,5 +519,6 @@ const styles = StyleSheet.create({
   footerSubtext: {
     fontSize: 10,
     color: '#bdc3c7',
+    textAlign: 'center',
   },
 });

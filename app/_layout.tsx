@@ -7,6 +7,8 @@ import 'react-native-reanimated';
 import Header from '../components/Header';
 import FooterTabs from '../components/FooterTabs';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { AuthProvider } from '../contexts/AuthContext';
+import AuthGuard from '../components/AuthGuard';
 
 export const unstable_settings = { anchor: '(tabs)' };
 
@@ -14,26 +16,24 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Header />
-
-      <Stack>
-        {/* Main tabs */}
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-
-        {/* Settings folder */}
-        <Stack.Screen name="settings/index" options={{ headerShown: false }} />
-        <Stack.Screen name="settings/login" options={{ headerShown: false }} />
-        <Stack.Screen name="settings/profile" options={{ headerShown: false }} />
-        <Stack.Screen name="settings/customize" options={{ headerShown: false }} />
-        <Stack.Screen name="settings/language" options={{ headerShown: false }} />
-
-        {/* Modal */}
-        <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
-      </Stack>
-
-      <FooterTabs />
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <AuthGuard>
+          <Header />
+          <Stack>
+            {/* Main tabs */}
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            
+            {/* Settings routes */}
+            <Stack.Screen name="settings" options={{ headerShown: false }} />
+            
+            {/* Modal */}
+            <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
+          </Stack>
+          <FooterTabs />
+          <StatusBar style="auto" />
+        </AuthGuard>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }

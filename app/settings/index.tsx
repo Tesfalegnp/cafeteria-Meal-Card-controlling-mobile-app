@@ -1,64 +1,50 @@
-// app/settings/index.tsx
-import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { supabase } from '../../lib/supabaseClient';
+import React from 'react';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function SettingsDashboard() {
   const router = useRouter();
-  const [student, setStudent] = useState<any | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    (async () => {
-      const sid = await AsyncStorage.getItem('studentId');
-      if (!sid) {
-        router.replace('/(tabs)/settings');
-        return;
-      }
-      try {
-        const { data, error } = await supabase.from('students').select('*').eq('student_id', sid).single();
-        if (error) {
-          console.warn(error);
-          setStudent(null);
-        } else {
-          setStudent(data);
-        }
-      } catch (err) {
-        console.warn(err);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, []);
+  const { student, logout } = useAuth();
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem('studentId');
-    router.replace('/(tabs)/settings');
+    await logout();
   };
-
-  if (loading) return <ActivityIndicator style={{ flex: 1 }} size="large" color="#2f95dc" />;
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Settings</Text>
-      <Text style={styles.subtitle}>Hello, {student?.first_name ?? 'Student'}</Text>
+      {/* Profile Header */}
+      <View style={styles.profileSection}>
+        <View style={styles.avatar}>
+          {student?.photo_url ? (
+            <Image source={{ uri: student.photo_url }} style={styles.avatarImage} />
+          ) : (
+            <Ionicons name="person" size={40} color="#666" />
+          )}
+        </View>
+        <View style={styles.profileInfo}>
+          <Text style={styles.name}>
+            {student?.first_name} {student?.last_name}
+          </Text>
+          <Text style={styles.studentId}>{student?.student_id}</Text>
+          <Text style={styles.department}>{student?.department}</Text>
+        </View>
+      </View>
 
       {/* Account Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Account</Text>
         <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/profile')}>
-          <Icon name="person-outline" size={20} color="#333" />
+          <Ionicons name="person-outline" size={20} color="#333" />
           <Text style={styles.itemText}>Profile</Text>
-          <Icon name="chevron-forward" size={16} color="#999" style={styles.arrow} />
+          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/change-password')}>
-          <Icon name="lock-closed-outline" size={20} color="#333" />
+          <Ionicons name="lock-closed-outline" size={20} color="#333" />
           <Text style={styles.itemText}>Change Password</Text>
-          <Icon name="chevron-forward" size={16} color="#999" style={styles.arrow} />
+          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
         </TouchableOpacity>
       </View>
 
@@ -66,21 +52,21 @@ export default function SettingsDashboard() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>App Customization</Text>
         <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/customize')}>
-          <Icon name="color-palette-outline" size={20} color="#333" />
+          <Ionicons name="color-palette-outline" size={20} color="#333" />
           <Text style={styles.itemText}>Theme & Appearance</Text>
-          <Icon name="chevron-forward" size={16} color="#999" style={styles.arrow} />
+          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/language')}>
-          <Icon name="language-outline" size={20} color="#333" />
+          <Ionicons name="language-outline" size={20} color="#333" />
           <Text style={styles.itemText}>Language</Text>
-          <Icon name="chevron-forward" size={16} color="#999" style={styles.arrow} />
+          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/notifications')}>
-          <Icon name="notifications-outline" size={20} color="#333" />
+          <Ionicons name="notifications-outline" size={20} color="#333" />
           <Text style={styles.itemText}>Notifications</Text>
-          <Icon name="chevron-forward" size={16} color="#999" style={styles.arrow} />
+          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
         </TouchableOpacity>
       </View>
 
@@ -88,21 +74,21 @@ export default function SettingsDashboard() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Support</Text>
         <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/complaint')}>
-          <Icon name="chatbubble-outline" size={20} color="#333" />
+          <Ionicons name="chatbubble-outline" size={20} color="#333" />
           <Text style={styles.itemText}>Complaint & Feedback</Text>
-          <Icon name="chevron-forward" size={16} color="#999" style={styles.arrow} />
+          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/help')}>
-          <Icon name="help-circle-outline" size={20} color="#333" />
+          <Ionicons name="help-circle-outline" size={20} color="#333" />
           <Text style={styles.itemText}>Help & Support</Text>
-          <Icon name="chevron-forward" size={16} color="#999" style={styles.arrow} />
+          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/faq')}>
-          <Icon name="list-circle-outline" size={20} color="#333" />
+          <Ionicons name="list-circle-outline" size={20} color="#333" />
           <Text style={styles.itemText}>FAQ</Text>
-          <Icon name="chevron-forward" size={16} color="#999" style={styles.arrow} />
+          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
         </TouchableOpacity>
       </View>
 
@@ -110,27 +96,27 @@ export default function SettingsDashboard() {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>About</Text>
         <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/about')}>
-          <Icon name="information-circle-outline" size={20} color="#333" />
+          <Ionicons name="information-circle-outline" size={20} color="#333" />
           <Text style={styles.itemText}>About App</Text>
-          <Icon name="chevron-forward" size={16} color="#999" style={styles.arrow} />
+          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/privacy')}>
-          <Icon name="shield-checkmark-outline" size={20} color="#333" />
+          <Ionicons name="shield-checkmark-outline" size={20} color="#333" />
           <Text style={styles.itemText}>Privacy Policy</Text>
-          <Icon name="chevron-forward" size={16} color="#999" style={styles.arrow} />
+          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/terms')}>
-          <Icon name="document-text-outline" size={20} color="#333" />
+          <Ionicons name="document-text-outline" size={20} color="#333" />
           <Text style={styles.itemText}>Terms of Service</Text>
-          <Icon name="chevron-forward" size={16} color="#999" style={styles.arrow} />
+          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
         </TouchableOpacity>
       </View>
 
       {/* Logout Button */}
       <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Icon name="log-out-outline" size={20} color="#ff3b30" />
+        <Ionicons name="log-out-outline" size={20} color="#ff3b30" />
         <Text style={styles.logoutText}>Logout</Text>
       </TouchableOpacity>
     </ScrollView>
@@ -138,11 +124,61 @@ export default function SettingsDashboard() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingTop: 28, paddingHorizontal: 18, backgroundColor: '#f7f8fb' },
-  title: { fontSize: 24, fontWeight: '700', marginBottom: 6 },
-  subtitle: { color: '#666', marginBottom: 24 },
-  section: { marginBottom: 24 },
-  sectionTitle: { fontSize: 16, fontWeight: '600', marginBottom: 12, color: '#333', marginLeft: 4 },
+  container: { 
+    flex: 1, 
+    backgroundColor: '#f8f9fa' 
+  },
+  profileSection: {
+    backgroundColor: '#fff',
+    padding: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ecf0f1',
+  },
+  avatar: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#ecf0f1',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  avatarImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+  },
+  profileInfo: {
+    flex: 1,
+  },
+  name: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#2c3e50',
+    marginBottom: 4,
+  },
+  studentId: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    marginBottom: 2,
+  },
+  department: {
+    fontSize: 14,
+    color: '#7f8c8d',
+  },
+  section: { 
+    marginTop: 20,
+    paddingHorizontal: 18,
+  },
+  sectionTitle: { 
+    fontSize: 16, 
+    fontWeight: '600', 
+    marginBottom: 12, 
+    color: '#333', 
+    marginLeft: 4 
+  },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -156,8 +192,15 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
-  itemText: { fontSize: 16, marginLeft: 12, flex: 1, color: '#333' },
-  arrow: { marginLeft: 'auto' },
+  itemText: { 
+    fontSize: 16, 
+    marginLeft: 12, 
+    flex: 1, 
+    color: '#333' 
+  },
+  arrow: { 
+    marginLeft: 'auto' 
+  },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -165,8 +208,8 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     backgroundColor: '#fff',
-    marginBottom: 32,
-    marginTop: 8,
+    margin: 18,
+    marginTop: 30,
     borderWidth: 1,
     borderColor: '#ff3b30',
     shadowColor: '#000',
@@ -175,5 +218,10 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     elevation: 2,
   },
-  logoutText: { fontSize: 16, fontWeight: '600', color: '#ff3b30', marginLeft: 8 },
+  logoutText: { 
+    fontSize: 16, 
+    fontWeight: '600', 
+    color: '#ff3b30', 
+    marginLeft: 8 
+  },
 });

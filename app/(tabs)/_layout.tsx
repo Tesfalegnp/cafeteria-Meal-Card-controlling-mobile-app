@@ -12,6 +12,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="index" />
       <Tabs.Screen name="posts" />
       <Tabs.Screen name="qrcode" />
+      <Tabs.Screen name="rule_regulation" />
     </Tabs>
   );
 }

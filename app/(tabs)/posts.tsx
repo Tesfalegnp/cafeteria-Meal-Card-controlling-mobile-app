@@ -1,25 +1,25 @@
 // app/(tabs)/posts.tsx
-import React, { useEffect, useState, useRef } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Animated,
   FlatList,
-  Text,
-  View,
+  Image,
+  Platform,
+  RefreshControl,
+  ScrollView,
   StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
-  Platform,
-  ScrollView,
-  Image,
-  RefreshControl,
-  Animated,
+  View,
 } from 'react-native';
 import { supabase } from '../../lib/supabaseClient';
-import { useRouter } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // ----------------------------
 // Type Definitions
