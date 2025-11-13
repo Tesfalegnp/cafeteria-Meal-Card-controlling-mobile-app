@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Meal_Card Controlling",
+    "name": "MTUSC",
     "slug": "TCSS-3",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -19,7 +19,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.hope_app.TCSS3"
     },
     "web": {
       "output": "static",
@@ -43,6 +44,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "e298f5c2-8cd7-4ac7-8937-e3d07f294fe1"
+      }
     }
   }
 }

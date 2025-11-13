@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  TextInput,
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
-import { Ionicons } from '@expo/vector-icons';
 
 export default function LoginScreen() {
   const [id, setId] = useState('');
@@ -39,10 +39,14 @@ export default function LoginScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <View style={styles.header}>
-        <Ionicons name="school" size={80} color="#1e3c72" />
-        <Text style={styles.title}>MTU Cafeteria</Text>
-        <Text style={styles.subtitle}>Digital Meal System</Text>
+        <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 40, marginBottom: 20 }}>
+          {/* Replaced Ionicon with smaller logo image */}
+        <Image
+          source={require('../../assets/images/logo-placeholder.png')}
+          style={{ width: 100, height: 100, borderRadius: 30, marginBottom: 8 }}
+        />
+        <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#1e3c72' }}>MTU</Text>
+        <Text style={{ fontSize: 15, color: '#555' }}>Digital Meal System</Text>
       </View>
 
       <View style={styles.form}>
@@ -78,8 +82,7 @@ export default function LoginScreen() {
 
         <View style={styles.helpSection}>
           <Text style={styles.helpText}>
-            First time? Leave password empty to set a new one
-          </Text>
+            New user or having trouble signing in? Reach out to the administrator for assistance.          </Text>
         </View>
       </View>
     </KeyboardAvoidingView>
