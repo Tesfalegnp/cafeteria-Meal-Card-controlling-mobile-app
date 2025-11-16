@@ -1,5 +1,14 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  Image, 
+  TouchableOpacity, 
+  ScrollView, 
+  Dimensions,
+  Animated 
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -12,6 +21,32 @@ const { width } = Dimensions.get('window');
 export default function HomeScreen() {
   const router = useRouter();
   const { student } = useAuth();
+  
+  // Animation values
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideUpAnim = useRef(new Animated.Value(50)).current;
+  const scaleAnim = useRef(new Animated.Value(0.9)).current;
+
+  useEffect(() => {
+    // Start animations when component mounts
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideUpAnim, {
+        toValue: 0,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 700,
+        useNativeDriver: true,
+      })
+    ]).start();
+  }, []);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -21,46 +56,91 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* --- Header with Gradient Background --- */}
-        <LinearGradient
-          colors={['#1e3c72', '#2a5298', '#1e3c72']}
-          style={styles.header}
+        <Animated.View 
+          style={[
+            styles.header,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideUpAnim }]
+            }
+          ]}
         >
-          <View style={styles.headerContent}>
-            <Text style={styles.universityName}>Mizan Tepi University</Text>
-            <Text style={styles.appTitle}>Digital Cafeteria System</Text>
-            
-            {/* Welcome Badge with Student Info */}
-            <View style={styles.welcomeBadge}>
-              <Ionicons name="cafe-outline" size={20} color="#fff" />
-              <Text style={styles.welcomeText}>
-                Welcome, {student?.first_name}
-              </Text>
+          <LinearGradient
+            colors={['#1e3c72', '#2a5298', '#1e3c72']}
+            style={styles.headerGradient}
+          >
+            <View style={styles.headerContent}>
+              {/* Animated Logo */}
+              <Text style={styles.universityName}>Mizan Tepi University</Text>
+              <Text style={styles.appTitle}>Digital Cafeteria System</Text>
+              
+              {/* Welcome Badge with Student Info */}
+              <Animated.View 
+                style={[
+                  styles.welcomeBadge,
+                  {
+                    opacity: fadeAnim,
+                    transform: [{ translateY: slideUpAnim }]
+                  }
+                ]}
+              >
+                <Ionicons name="cafe-outline" size={20} color="#fff" />
+                <Text style={styles.welcomeText}>
+                  Welcome, {student?.first_name || 'Student'}
+                </Text>
+              </Animated.View>
+
+              {/* Student Quick Info */}
+              <Animated.View 
+                style={[
+                  styles.studentInfo,
+                  {
+                    opacity: fadeAnim
+                  }
+                ]}
+              >
+              </Animated.View>
             </View>
-          </View>
-        </LinearGradient>
+          </LinearGradient>
+        </Animated.View>
 
         {/* --- Quick Actions Section --- */}
-        <View style={styles.quickActions}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
-          <View style={styles.actionsGrid}>
-            <QuickActionCard
-              title="Meal Card"
-              icon="card"
-              color="#FF6B6B"
-              subtitle="Current Balance"
-              value="125.50 ETB"
-              onPress={() => router.push('/(tabs)')}
-            />
-            <QuickActionCard
-              title="Today's Menu"
-              icon="restaurant"
-              color="#4ECDC4"
-              subtitle="Available Meals"
-              value="8 Items"
-              onPress={() => router.push('/(tabs)/rule_regulation')}
-            />
-          </View>
-        </View>
+          <Text style={styles.sectionTitle}></Text>
+          
+
+        {/* --- Today's Special Highlight --- */}
+        <Animated.View 
+          style={[
+            styles.todaySpecial,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideUpAnim }]
+            }
+          ]}
+        >
+          <LinearGradient
+            colors={['#FF6B6B', '#FF8E53']}
+            style={styles.todaySpecialGradient}
+          >
+            <View style={styles.specialContent}>
+              <View style={styles.specialBadge}>
+                <Ionicons name="flash" size={16} color="#fff" />
+                <Text style={styles.specialBadgeText}>Today's Special</Text>
+              </View>
+              <Text style={styles.specialTime}>🍽️ Available until 8:00 PM</Text>
+              <TouchableOpacity 
+                style={styles.viewMenuButton}
+                onPress={() => router.push('../settings/weeklyMenuView')}
+              >
+                <Text style={styles.viewMenuText}>View Full Menu</Text>
+                <Ionicons name="arrow-forward" size={16} color="#FF6B6B" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.specialImage}>
+              <Text style={styles.foodEmoji}>🍗🥗</Text>
+            </View>
+          </LinearGradient>
+        </Animated.View>
 
         {/* --- Main Features Grid --- */}
         <View style={styles.featuresSection}>
@@ -72,6 +152,7 @@ export default function HomeScreen() {
               description="Quick meal purchase"
               color="#45B7D1"
               onPress={() => router.push('/(tabs)/qrcode')}
+              animation={fadeAnim}
             />
             <FeatureCard
               title="Meal History"
@@ -79,6 +160,7 @@ export default function HomeScreen() {
               description="View past transactions"
               color="#96CEB4"
               onPress={() => router.push('/(tabs)')}
+              animation={fadeAnim}
             />
             <FeatureCard
               title="Top Up"
@@ -86,19 +168,29 @@ export default function HomeScreen() {
               description="Add funds to card"
               color="#FECA57"
               onPress={() => router.push('/(tabs)')}
+              animation={fadeAnim}
             />
             <FeatureCard
-              title="Rules & Regulations"
-              icon="document-text"
-              description="Cafeteria policies"
+              title="Weekly Menu"
+              icon="restaurant"
+              description="View meal schedule"
               color="#FF6B8B"
-              onPress={() => router.push('/(tabs)/rule_regulation')}
+              onPress={() => router.push('./settings/weeklyMenuView')}
+              animation={fadeAnim}
             />
           </View>
         </View>
 
         {/* --- Additional Features Row --- */}
-        <View style={styles.additionalFeatures}>
+        <Animated.View 
+          style={[
+            styles.additionalFeatures,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideUpAnim }]
+            }
+          ]}
+        >
           <TouchableOpacity style={styles.additionalFeature} onPress={() => router.push('/settings/about')}>
             <LinearGradient
               colors={['#667eea', '#764ba2']}
@@ -118,10 +210,18 @@ export default function HomeScreen() {
               <Text style={styles.additionalFeatureText}>Help & Support</Text>
             </LinearGradient>
           </TouchableOpacity>
-        </View>
+        </Animated.View>
 
         {/* --- Campus Info Card --- */}
-        <View style={styles.campusCard}>
+        <Animated.View 
+          style={[
+            styles.campusCard,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideUpAnim }]
+            }
+          ]}
+        >
           <LinearGradient
             colors={['#667eea', '#764ba2']}
             style={styles.campusCardGradient}
@@ -134,20 +234,20 @@ export default function HomeScreen() {
               </View>
             </View>
             <View style={styles.stats}>
-              <View style={styles.statItem}>
-                <Text style={styles.statNumber}>1,200+</Text>
-                <Text style={styles.statLabel}>Students Served</Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text style={styles.statNumber}>15+</Text>
-                <Text style={styles.statLabel}>Daily Meals</Text>
-              </View>
             </View>
           </LinearGradient>
-        </View>
+        </Animated.View>
 
         {/* --- Quick Stats --- */}
-        <View style={styles.quickStats}>
+        <Animated.View 
+          style={[
+            styles.quickStats,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideUpAnim }]
+            }
+          ]}
+        >
           <View style={styles.statCard}>
             <Ionicons name="fast-food" size={24} color="#FF6B6B" />
             <Text style={styles.statCardNumber}>3</Text>
@@ -155,18 +255,47 @@ export default function HomeScreen() {
           </View>
           <View style={styles.statCard}>
             <Ionicons name="calendar" size={24} color="#4ECDC4" />
-            <Text style={styles.statCardNumber}>42</Text>
+            <Text style={styles.statCardNumber}>900</Text>
             <Text style={styles.statCardLabel}>This Month</Text>
           </View>
-          <View style={styles.statCard}>
-            <Ionicons name="wallet" size={24} color="#FECA57" />
-            <Text style={styles.statCardNumber}>125.50</Text>
-            <Text style={styles.statCardLabel}>Balance</Text>
+        </Animated.View>
+        {/* --- Nutrition Tips --- */}
+        <Animated.View 
+          style={[
+            styles.nutritionTips,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideUpAnim }]
+            }
+          ]}
+        >
+          <Text style={styles.sectionTitle}>🍎 Nutrition Tips</Text>
+          <View style={styles.tipsContainer}>
+            <View style={styles.tipItem}>
+              <Ionicons name="water" size={20} color="#45B7D1" />
+              <Text style={styles.tipText}>Stay hydrated with 8 glasses of water daily</Text>
+            </View>
+            <View style={styles.tipItem}>
+              <Ionicons name="leaf" size={20} color="#96CEB4" />
+              <Text style={styles.tipText}>Include fruits and vegetables in every meal</Text>
+            </View>
+            <View style={styles.tipItem}>
+              <Ionicons name="barbell" size={20} color="#FF6B6B" />
+              <Text style={styles.tipText}>Balance your protein, carbs, and fats</Text>
+            </View>
           </View>
-        </View>
+        </Animated.View>
 
         {/* --- Emergency Contact --- */}
-        <View style={styles.contactCard}>
+        <Animated.View 
+          style={[
+            styles.contactCard,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideUpAnim }]
+            }
+          ]}
+        >
           <View style={styles.contactHeader}>
             <Ionicons name="call-outline" size={20} color="#e74c3c" />
             <Text style={styles.contactTitle}>Need Help?</Text>
@@ -179,49 +308,65 @@ export default function HomeScreen() {
             <Ionicons name="alert-circle" size={16} color="#fff" />
             <Text style={styles.emergencyButtonText}>Emergency Contact</Text>
           </TouchableOpacity>
-        </View>
+        </Animated.View>
 
         {/* --- Footer --- */}
-        <View style={styles.footer}>
+        <Animated.View 
+          style={[
+            styles.footer,
+            {
+              opacity: fadeAnim
+            }
+          ]}
+        >
           <Text style={styles.footerText}>© 2025 Mizan Tepi University</Text>
           <Text style={styles.footerSubtext}>
             By Tesfalegn Petros and Birhanu Kassa from software department at 2014 batch
           </Text>
-        </View>
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 // Quick Action Card Component
-function QuickActionCard({ title, icon, color, subtitle, value, onPress }: any) {
+function QuickActionCard({ title, icon, color, subtitle, value, onPress, animation }: any) {
   return (
-    <TouchableOpacity style={styles.quickActionCard} onPress={onPress}>
-      <LinearGradient
-        colors={[color, `${color}DD`]}
-        style={styles.quickActionGradient}
-      >
-        <View style={styles.quickActionHeader}>
-          <Ionicons name={icon} size={24} color="#fff" />
-          <Text style={styles.quickActionTitle}>{title}</Text>
-        </View>
-        <Text style={styles.quickActionSubtitle}>{subtitle}</Text>
-        <Text style={styles.quickActionValue}>{value}</Text>
-      </LinearGradient>
-    </TouchableOpacity>
+    <Animated.View style={{ opacity: animation }}>
+      <TouchableOpacity style={styles.quickActionCard} onPress={onPress}>
+        <LinearGradient
+          colors={[color, `${color}DD`]}
+          style={styles.quickActionGradient}
+        >
+          <View style={styles.quickActionHeader}>
+            <Ionicons name={icon} size={24} color="#fff" />
+            <Text style={styles.quickActionTitle}>{title}</Text>
+          </View>
+          <Text style={styles.quickActionSubtitle}>{subtitle}</Text>
+          <Text style={styles.quickActionValue}>{value}</Text>
+        </LinearGradient>
+      </TouchableOpacity>
+    </Animated.View>
   );
 }
 
 // Feature Card Component
-function FeatureCard({ title, icon, description, color, onPress }: any) {
+function FeatureCard({ title, icon, description, color, onPress, animation }: any) {
   return (
-    <TouchableOpacity style={styles.featureCard} onPress={onPress}>
-      <View style={[styles.featureIcon, { backgroundColor: color }]}>
-        <Ionicons name={icon} size={28} color="#fff" />
-      </View>
-      <Text style={styles.featureTitle}>{title}</Text>
-      <Text style={styles.featureDescription}>{description}</Text>
-    </TouchableOpacity>
+    <Animated.View 
+      style={[
+        styles.featureCard,
+        { opacity: animation }
+      ]}
+    >
+      <TouchableOpacity onPress={onPress}>
+        <View style={[styles.featureIcon, { backgroundColor: color }]}>
+          <Ionicons name={icon} size={28} color="#fff" />
+        </View>
+        <Text style={styles.featureTitle}>{title}</Text>
+        <Text style={styles.featureDescription}>{description}</Text>
+      </TouchableOpacity>
+    </Animated.View>
   );
 }
 
@@ -235,13 +380,25 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   header: {
-    paddingVertical: 30,
-    paddingHorizontal: 20,
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
+    overflow: 'hidden',
+  },
+  headerGradient: {
+    paddingVertical: 30,
+    paddingHorizontal: 20,
   },
   headerContent: {
     alignItems: 'center',
+  },
+  logoContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 15,
   },
   universityName: {
     fontSize: 18,
@@ -268,6 +425,26 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     fontWeight: '600',
     fontSize: 12,
+  },
+  studentInfo: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginTop: 10,
+  },
+  infoItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginHorizontal: 5,
+  },
+  infoText: {
+    color: '#fff',
+    fontSize: 10,
+    marginLeft: 4,
+    fontWeight: '500',
   },
   quickActions: {
     padding: 20,
@@ -318,6 +495,74 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 18,
     marginTop: 5,
+  },
+  todaySpecial: {
+    marginHorizontal: 20,
+    marginBottom: 20,
+    borderRadius: 20,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  todaySpecialGradient: {
+    padding: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  specialContent: {
+    flex: 1,
+  },
+  specialBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    marginBottom: 8,
+  },
+  specialBadgeText: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
+    marginLeft: 4,
+  },
+  specialTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#fff',
+    marginBottom: 4,
+  },
+  specialTime: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.8)',
+    marginBottom: 10,
+  },
+  viewMenuButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: '#fff',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  viewMenuText: {
+    color: '#FF6B6B',
+    fontSize: 12,
+    fontWeight: '600',
+    marginRight: 4,
+  },
+  specialImage: {
+    marginLeft: 10,
+  },
+  foodEmoji: {
+    fontSize: 40,
   },
   featuresSection: {
     padding: 20,
@@ -461,6 +706,33 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#7f8c8d',
     marginTop: 2,
+  },
+  nutritionTips: {
+    padding: 20,
+    paddingTop: 0,
+  },
+  tipsContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    padding: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  tipItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f8f9fa',
+  },
+  tipText: {
+    fontSize: 14,
+    color: '#666',
+    marginLeft: 12,
+    flex: 1,
   },
   contactCard: {
     backgroundColor: '#fff',
