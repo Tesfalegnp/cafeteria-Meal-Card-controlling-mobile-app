@@ -1,3 +1,5 @@
+// /home/hope/Project_package/Meal_card/Mobile_app/TCSS-3/app/(tabs)/index.tsx
+
 import React, { useEffect, useRef } from 'react';
 import { 
   View, 
@@ -99,15 +101,19 @@ export default function HomeScreen() {
                   }
                 ]}
               >
+                <View style={styles.infoItem}>
+                  <Ionicons name="id-card" size={12} color="#fff" />
+                  <Text style={styles.infoText}>{student?.student_id || 'N/A'}</Text>
+                </View>
+                <View style={styles.infoItem}>
+                  <Ionicons name="business" size={12} color="#fff" />
+                  <Text style={styles.infoText}>{student?.department || 'N/A'}</Text>
+                </View>
               </Animated.View>
             </View>
           </LinearGradient>
         </Animated.View>
-
-        {/* --- Quick Actions Section --- */}
-          <Text style={styles.sectionTitle}></Text>
-          
-
+        <Text></Text>
         {/* --- Today's Special Highlight --- */}
         <Animated.View 
           style={[
@@ -127,6 +133,7 @@ export default function HomeScreen() {
                 <Ionicons name="flash" size={16} color="#fff" />
                 <Text style={styles.specialBadgeText}>Today's Special</Text>
               </View>
+              <Text style={styles.specialTitle}>Special Chicken BBQ with Fresh Salad</Text>
               <Text style={styles.specialTime}>🍽️ Available until 8:00 PM</Text>
               <TouchableOpacity 
                 style={styles.viewMenuButton}
@@ -159,7 +166,7 @@ export default function HomeScreen() {
               icon="time"
               description="View past transactions"
               color="#96CEB4"
-              onPress={() => router.push('/(tabs)')}
+              onPress={() => router.push('../settings/meal_history')}
               animation={fadeAnim}
             />
             <FeatureCard
@@ -175,7 +182,7 @@ export default function HomeScreen() {
               icon="restaurant"
               description="View meal schedule"
               color="#FF6B8B"
-              onPress={() => router.push('./settings/weeklyMenuView')}
+              onPress={() => router.push('../settings/weeklyMenuView')}
               animation={fadeAnim}
             />
           </View>
@@ -191,7 +198,7 @@ export default function HomeScreen() {
             }
           ]}
         >
-          <TouchableOpacity style={styles.additionalFeature} onPress={() => router.push('/settings/about')}>
+          <TouchableOpacity style={styles.additionalFeature} onPress={() => router.push('../settings/about')}>
             <LinearGradient
               colors={['#667eea', '#764ba2']}
               style={styles.additionalFeatureGradient}
@@ -234,6 +241,14 @@ export default function HomeScreen() {
               </View>
             </View>
             <View style={styles.stats}>
+              <View style={styles.statItem}>
+                <Text style={styles.statNumber}>1,200+</Text>
+                <Text style={styles.statLabel}>Students</Text>
+              </View>
+              <View style={styles.statItem}>
+                <Text style={styles.statNumber}>3</Text>
+                <Text style={styles.statLabel}>Meals/Day</Text>
+              </View>
             </View>
           </LinearGradient>
         </Animated.View>
@@ -259,6 +274,7 @@ export default function HomeScreen() {
             <Text style={styles.statCardLabel}>This Month</Text>
           </View>
         </Animated.View>
+
         {/* --- Nutrition Tips --- */}
         <Animated.View 
           style={[
