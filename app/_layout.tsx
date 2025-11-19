@@ -1,3 +1,4 @@
+// Mobile_app/TCSS-3/app/_layout.tsx
 import React from 'react';
 import { ThemeProvider, DarkTheme, DefaultTheme } from '@react-navigation/native';
 import { Stack } from 'expo-router';
@@ -26,6 +27,22 @@ export default function RootLayout() {
             
             {/* Settings routes */}
             <Stack.Screen name="settings" options={{ headerShown: false }} />
+            
+            {/* Council routes */}
+            <Stack.Screen 
+              name="council/president-vice" 
+              options={{ 
+                title: 'President/Vice President',
+                headerShown: false 
+              }} 
+            />
+            <Stack.Screen 
+              name="council/cafeteria-committee" 
+              options={{ 
+                title: 'Cafeteria Committee',
+                headerShown: false 
+              }} 
+            />
             
             {/* Modal */}
             <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />

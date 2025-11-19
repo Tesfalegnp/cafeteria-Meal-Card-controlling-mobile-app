@@ -1,227 +1,260 @@
-import { Ionicons } from '@expo/vector-icons';
-import { useRouter } from 'expo-router';
+// Mobile_app/TCSS-3/app/settings/index.tsx
 import React from 'react';
-import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  Alert,
+  Linking,
+} from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
+import { useRouter } from 'expo-router';
 
-export default function SettingsDashboard() {
+export default function SettingsScreen() {
+  const { student, councilMember, logout } = useAuth();
   const router = useRouter();
-  const { student, logout } = useAuth();
 
-  const handleLogout = async () => {
-    await logout();
+  const handleCouncilFeature = () => {
+    if (!councilMember) {
+      Alert.alert(
+        'Access Denied',
+        'Sorry, you are not authorized for this service. This feature is only available for council members.'
+      );
+      return;
+    }
+
+    // Navigate based on council member type
+    if (councilMember.working_type === 'president' || councilMember.working_type === 'vice_president') {
+      router.push('/council/president-vice');
+    } else if (councilMember.working_type === 'cafeteria') {
+      router.push('/council/cafeteria-committee');
+    } else {
+      Alert.alert(
+        'Access Limited',
+        'Your council position does not have access to special features yet.'
+      );
+    }
   };
 
+  const handleLogout = () => {
+    Alert.alert(
+      'Logout',
+      'Are you sure you want to logout?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { text: 'Logout', style: 'destructive', onPress: logout },
+      ]
+    );
+  };
+
+  const menuItems = [
+    {
+      title: 'Profile',
+      icon: '👤',
+      route: '/settings/profile',
+    },
+    {
+      title: 'Change Password',
+      icon: '🔒',
+      route: '/settings/change-password',
+    },
+    {
+      title: 'Notifications',
+      icon: '🔔',
+      route: '/settings/notifications',
+    },
+    {
+      title: 'Customize',
+      icon: '🎨',
+      route: '/settings/customize',
+    },
+    {
+      title: 'Language',
+      icon: '🌐',
+      route: '/settings/language',
+    },
+    {
+      title: 'More Feature',
+      icon: '⭐',
+      onPress: handleCouncilFeature,
+      isSpecial: true,
+    },
+    {
+      title: 'Help & Support',
+      icon: '❓',
+      route: '/settings/help',
+    },
+    {
+      title: 'FAQ',
+      icon: '📚',
+      route: '/settings/faq',
+    },
+    {
+      title: 'Complaint',
+      icon: '📝',
+      route: '/settings/complaint',
+    },
+    {
+      title: 'About',
+      icon: 'ℹ️',
+      route: '/settings/about',
+    },
+    {
+      title: 'Privacy Policy',
+      icon: '🛡️',
+      route: '/settings/privacy',
+    },
+    {
+      title: 'Terms & Conditions',
+      icon: '📄',
+      route: '/settings/terms',
+    },
+  ];
+
   return (
-    <ScrollView style={styles.container}>
-      {/* Profile Header */}
-      <View style={styles.profileSection}>
-        <View style={styles.avatar}>
-          {student?.photo_url ? (
-            <Image source={{ uri: student.photo_url }} style={styles.avatarImage} />
-          ) : (
-            <Ionicons name="person" size={40} color="#666" />
-          )}
-        </View>
-        <View style={styles.profileInfo}>
-          <Text style={styles.name}>
-            {student?.first_name} {student?.last_name}
-          </Text>
-          <Text style={styles.studentId}>{student?.student_id}</Text>
-          <Text style={styles.department}>{student?.department}</Text>
-        </View>
+    <View style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.title}>Settings</Text>
+        <Text style={styles.subtitle}>
+          Welcome, {student?.first_name} {student?.last_name}
+        </Text>
+        {councilMember && (
+          <View style={styles.councilBadge}>
+            <Text style={styles.councilText}>
+              {councilMember.position} • {councilMember.working_type}
+            </Text>
+          </View>
+        )}
       </View>
 
-      {/* Account Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Account</Text>
-        <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/profile')}>
-          <Ionicons name="person-outline" size={20} color="#333" />
-          <Text style={styles.itemText}>Profile</Text>
-          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
-        </TouchableOpacity>
+      {/* Menu Items */}
+      <ScrollView style={styles.menuContainer}>
+        {menuItems.map((item, index) => (
+          <TouchableOpacity
+            key={index}
+            style={[
+              styles.menuItem,
+              item.isSpecial && styles.specialMenuItem,
+            ]}
+            onPress={item.onPress || (() => item.route && router.push(item.route))}
+          >
+            <View style={styles.menuItemLeft}>
+              <Text style={styles.menuIcon}>{item.icon}</Text>
+              <Text style={[
+                styles.menuText,
+                item.isSpecial && styles.specialMenuText,
+              ]}>
+                {item.title}
+              </Text>
+            </View>
+            <Text style={styles.menuArrow}>›</Text>
+          </TouchableOpacity>
+        ))}
 
-        <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/change-password')}>
-          <Ionicons name="lock-closed-outline" size={20} color="#333" />
-          <Text style={styles.itemText}>Change Password</Text>
-          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
+        {/* Logout Button */}
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={handleLogout}
+        >
+          <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
-      </View>
-
-      {/* App Customization Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>App Customization</Text>
-        <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/customize')}>
-          <Ionicons name="color-palette-outline" size={20} color="#333" />
-          <Text style={styles.itemText}>Theme & Appearance</Text>
-          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/language')}>
-          <Ionicons name="language-outline" size={20} color="#333" />
-          <Text style={styles.itemText}>Language</Text>
-          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/notifications')}>
-          <Ionicons name="notifications-outline" size={20} color="#333" />
-          <Text style={styles.itemText}>Notifications</Text>
-          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
-        </TouchableOpacity>
-      </View>
-
-      {/* Support Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Support</Text>
-        <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/complaint')}>
-          <Ionicons name="chatbubble-outline" size={20} color="#333" />
-          <Text style={styles.itemText}>Complaint & Feedback</Text>
-          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/help')}>
-          <Ionicons name="help-circle-outline" size={20} color="#333" />
-          <Text style={styles.itemText}>Help & Support</Text>
-          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/faq')}>
-          <Ionicons name="list-circle-outline" size={20} color="#333" />
-          <Text style={styles.itemText}>FAQ</Text>
-          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
-        </TouchableOpacity>
-      </View>
-
-      {/* About Section */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>About</Text>
-        <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/about')}>
-          <Ionicons name="information-circle-outline" size={20} color="#333" />
-          <Text style={styles.itemText}>About App</Text>
-          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/privacy')}>
-          <Ionicons name="shield-checkmark-outline" size={20} color="#333" />
-          <Text style={styles.itemText}>Privacy Policy</Text>
-          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.item} onPress={() => router.push('/settings/terms')}>
-          <Ionicons name="document-text-outline" size={20} color="#333" />
-          <Text style={styles.itemText}>Terms of Service</Text>
-          <Ionicons name="chevron-forward" size={16} color="#999" style={styles.arrow} />
-        </TouchableOpacity>
-      </View>
-
-      {/* Logout Button */}
-      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-        <Ionicons name="log-out-outline" size={20} color="#ff3b30" />
-        <Text style={styles.logoutText}>Logout</Text>
-      </TouchableOpacity>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: '#f8f9fa' 
-  },
-  profileSection: {
-    backgroundColor: '#fff',
-    padding: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderBottomWidth: 1,
-    borderBottomColor: '#ecf0f1',
-  },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#ecf0f1',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 15,
-  },
-  avatarImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-  },
-  profileInfo: {
+  container: {
     flex: 1,
+    backgroundColor: '#f8f9fa',
   },
-  name: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#2c3e50',
+  header: {
+    backgroundColor: '#1e3c72',
+    padding: 20,
+    paddingTop: 60,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#fff',
     marginBottom: 4,
   },
-  studentId: {
-    fontSize: 14,
-    color: '#7f8c8d',
-    marginBottom: 2,
+  subtitle: {
+    fontSize: 16,
+    color: '#fff',
+    opacity: 0.9,
   },
-  department: {
-    fontSize: 14,
-    color: '#7f8c8d',
+  councilBadge: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    alignSelf: 'flex-start',
+    marginTop: 8,
   },
-  section: { 
-    marginTop: 20,
-    paddingHorizontal: 18,
+  councilText: {
+    fontSize: 12,
+    color: '#fff',
+    fontWeight: '500',
   },
-  sectionTitle: { 
-    fontSize: 16, 
-    fontWeight: '600', 
-    marginBottom: 12, 
-    color: '#333', 
-    marginLeft: 4 
+  menuContainer: {
+    flex: 1,
+    padding: 16,
   },
-  item: {
+  menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#fff',
     padding: 16,
     borderRadius: 12,
-    backgroundColor: '#fff',
-    marginBottom: 8,
+    marginBottom: 12,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  itemText: { 
-    fontSize: 16, 
-    marginLeft: 12, 
-    flex: 1, 
-    color: '#333' 
+  specialMenuItem: {
+    backgroundColor: '#fff3cd',
+    borderColor: '#ffeaa7',
+    borderWidth: 2,
   },
-  arrow: { 
-    marginLeft: 'auto' 
+  menuItemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  menuIcon: {
+    fontSize: 20,
+    marginRight: 12,
+  },
+  menuText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#333',
+  },
+  specialMenuText: {
+    color: '#856404',
+    fontWeight: '600',
+  },
+  menuArrow: {
+    fontSize: 20,
+    color: '#666',
   },
   logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: '#dc3545',
     padding: 16,
     borderRadius: 12,
-    backgroundColor: '#fff',
-    margin: 18,
-    marginTop: 30,
-    borderWidth: 1,
-    borderColor: '#ff3b30',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 40,
   },
-  logoutText: { 
-    fontSize: 16, 
-    fontWeight: '600', 
-    color: '#ff3b30', 
-    marginLeft: 8 
+  logoutText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

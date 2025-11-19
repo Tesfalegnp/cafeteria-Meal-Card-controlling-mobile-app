@@ -1,3 +1,4 @@
+// Mobile_app/TCSS-3/contexts/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase } from '../lib/supabaseClient';
@@ -17,17 +18,32 @@ interface Student {
   email: string | null;
 }
 
+interface CouncilMember {
+  id: string;
+  student_id: string;
+  working_type: string;
+  position: string;
+  academic_year: string;
+  is_active: boolean;
+  responsibilities: string[];
+  start_date: string;
+  end_date: string | null;
+}
+
 interface AuthContextType {
   student: Student | null;
+  councilMember: CouncilMember | null;
   isLoading: boolean;
   login: (studentId: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
+  refreshCouncilMember: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [student, setStudent] = useState<Student | null>(null);
+  const [councilMember, setCouncilMember] = useState<CouncilMember | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -39,6 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const studentId = await AsyncStorage.getItem('studentId');
       if (studentId) {
         await fetchStudentData(studentId);
+        await fetchCouncilMemberData(studentId);
       }
     } catch (error) {
       console.error('Error checking auth state:', error);
@@ -60,6 +77,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Error fetching student data:', error);
       await logout();
+    }
+  };
+
+  const fetchCouncilMemberData = async (studentId: string) => {
+    try {
+      const currentYear = new Date().getFullYear().toString();
+      
+      const { data, error } = await supabase
+        .from('council_members')
+        .select('*')
+        .eq('student_id', studentId)
+        .eq('academic_year', currentYear)
+        .eq('is_active', true)
+        .single();
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 means no rows returned
+        throw error;
+      }
+      
+      setCouncilMember(data || null);
+    } catch (error) {
+      console.error('Error fetching council member data:', error);
+      setCouncilMember(null);
+    }
+  };
+
+  const refreshCouncilMember = async () => {
+    if (student) {
+      await fetchCouncilMemberData(student.student_id);
     }
   };
 
@@ -91,6 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         await AsyncStorage.setItem('studentId', studentId.trim());
         setStudent({ ...data, password });
+        await fetchCouncilMemberData(studentId.trim());
         return true;
       }
 
@@ -98,6 +145,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data.password === password) {
         await AsyncStorage.setItem('studentId', studentId.trim());
         setStudent(data);
+        await fetchCouncilMemberData(studentId.trim());
         return true;
       }
 
@@ -112,13 +160,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       await AsyncStorage.removeItem('studentId');
       setStudent(null);
+      setCouncilMember(null);
     } catch (error) {
       console.error('Logout error:', error);
     }
   };
 
   return (
-    <AuthContext.Provider value={{ student, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ 
+      student, 
+      councilMember, 
+      isLoading, 
+      login, 
+      logout,
+      refreshCouncilMember 
+    }}>
       {children}
     </AuthContext.Provider>
   );
